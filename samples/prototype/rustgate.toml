@@ -1,0 +1,10 @@
+[[hosts]]
+name = "pokemon"
+base_url = "https://pokeapi.co/api/v2"
+
+[[hosts]]
+name = "randomuser"
+base_url = "https://randomuser.me/api"
+
+[[endpoints]]
+path = "/trainer/(kbb)"
