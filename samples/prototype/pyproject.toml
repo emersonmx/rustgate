@@ -8,6 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 uvicorn = {extras = ["standard"], version = "^0.27.0"}
+httpx = "^0.26.0"
+pydantic = "^2.5.3"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.7"
@@ -68,7 +70,6 @@ select = [
     "SLOT",  # flake8-slots
     "T10",   # flake8-debugger
     "T20",   # flake8-print
-    "TCH",   # flake8-type-checking
     "TD",    # flake8-todos
     "TID",   # flake8-tidy-imports
     "TRY",   # tryceratops
