@@ -4,32 +4,17 @@ SRC=$(shell git ls-files '*.py')
 run:
 	python -m pygate
 
-.PHONY: fmt
-fmt: ruff-format-isort ruff-format ruff-fix
-
-.PHONY: ruff-format-isort
-ruff-format-isort:
-	@ruff check --select I --fix --preview . ${SRC}
-
-.PHONY: ruff-format
-ruff-format:
-	@ruff format --force-exclude --preview ${SRC}
-
-.PHONY: ruff-fix
-ruff-fix:
+.PHONY: format
+format:
+	@ruff format --preview --quiet .
 	@ruff check . --fix --force-exclude --preview ${SRC}
+	@ruff format --preview --quiet .
+
+.PHONY: fmt
+fmt: format
 
 .PHONY: check
-check: ruff mypy vulture
-
-.PHONY: ruff
-ruff:
+check:
 	@ruff check --force-exclude --preview ${SRC}
-
-.PHONY: mypy
-mypy:
 	@mypy ${SRC}
-
-.PHONY: vulture
-vulture:
 	@vulture ${SRC}
