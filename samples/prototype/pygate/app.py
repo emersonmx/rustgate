@@ -10,8 +10,31 @@ class Scope(TypedDict):
     type: Literal["http", "lifespan"]
 
 
-Receiver = Callable[[], Coroutine[Any, Any, dict[str, Any]]]
-Sender = Callable[[dict[str, Any]], Coroutine[Any, Any, None]]
+class ResponseStart(TypedDict):
+    type: Literal["http.response.start"]
+    status: int
+    headers: list[tuple[bytes, bytes]]
+
+
+class ResponseBody(TypedDict):
+    type: Literal["http.response.body"]
+    body: bytes
+
+
+class ResponseLifetime(TypedDict):
+    type: Literal[
+        "lifespan.startup.complete",
+        "lifespan.shutdown.complete",
+    ]
+
+
+class Request(TypedDict):
+    type: Literal["lifespan.startup", "lifespan.shutdown"]
+
+
+Response = ResponseStart | ResponseBody | ResponseLifetime
+Receiver = Callable[[], Coroutine[Any, Any, Request]]
+Sender = Callable[[Response], Coroutine[Any, Any, None]]
 
 
 class Application:
@@ -54,7 +77,12 @@ class Application:
         self.shutdown_lifespan = shutdown_lifespan or self._null_lifespan
         self.router = router or self._null_http_router
 
-    async def __call__(self, scope: Scope, receive, send) -> None:
+    async def __call__(
+        self,
+        scope: Scope,
+        receive: Receiver,
+        send: Sender,
+    ) -> None:
         if scope["type"] == "http":
             await self.router(scope, receive, send)
         elif scope["type"] == "lifespan":
@@ -62,14 +90,19 @@ class Application:
         else:
             raise UnhandledScopeTypeError
 
-    async def _handle_lifespan(self, _scope: Scope, receive, send) -> None:
+    async def _handle_lifespan(
+        self,
+        _scope: Scope,
+        receive: Receiver,
+        send: Sender,
+    ) -> None:
         while True:
             message = await receive()
 
             type_ = message["type"]
             if type_ == "lifespan.startup":
                 await self.startup_lifespan()
-                await send({"type": f"{type_}.complete"})
+                await send({"type": "lifespan.startup.complete"})
             elif type_ == "lifespan.shutdown":
                 await self.shutdown_lifespan()
-                await send({"type": f"{type_}.complete"})
+                await send({"type": "lifespan.shutdown.complete"})
