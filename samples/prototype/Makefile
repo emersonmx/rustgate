@@ -1,5 +1,9 @@
 SRC=$(shell git ls-files '*.py')
 
+.PHONY: run
+run:
+	python -m pygate
+
 .PHONY: fmt
 fmt: ruff-format-isort ruff-format ruff-fix
 

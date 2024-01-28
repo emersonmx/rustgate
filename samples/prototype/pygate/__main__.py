@@ -17,22 +17,18 @@ async def router(scope, receive, send):
     data = await receive()
     pprint(scope)
     pprint(data)
-    await send(
-        {
-            "type": "http.response.start",
-            "status": 200,
-            "headers": [
-                [b"content-type", b"text/plain"],
-            ],
-        }
-    )
+    await send({
+        "type": "http.response.start",
+        "status": 200,
+        "headers": [
+            [b"content-type", b"text/plain"],
+        ],
+    })
 
-    await send(
-        {
-            "type": "http.response.body",
-            "body": b"Hello World!",
-        }
-    )
+    await send({
+        "type": "http.response.body",
+        "body": b"Hello World!",
+    })
 
 
 def create_app():
