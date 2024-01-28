@@ -79,3 +79,6 @@ select = [
     "UP",    # pyupgrade
     "W",     # pycodestyle
 ]
+
+[tool.vulture]
+min_confidence = 100
