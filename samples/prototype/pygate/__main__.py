@@ -1,5 +1,7 @@
+import asyncio
 from pprint import pprint
 
+import uvicorn
 from httpx import AsyncClient
 
 from .app import Application
@@ -33,6 +35,20 @@ async def router(scope, receive, send):
     )
 
 
-app = Application()
-app.shutdown_lifespan = shutdown_lifespan
-app.router = router
+def create_app():
+    app = Application()
+    app.shutdown_lifespan = shutdown_lifespan
+    app.router = router
+
+    return app
+
+
+async def main() -> int:
+    config = uvicorn.Config(create_app(), log_level="info", reload=True)
+    server = uvicorn.Server(config)
+    await server.serve()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(asyncio.run(main()))
